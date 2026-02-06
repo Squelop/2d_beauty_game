@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Glow Empire: Beauty Mogul Strategy Prototype</title>
+  <style>
+    :root {
+      --bg: #faf6f2;
+      --card: #ffffff;
+      --ink: #3b2f2f;
+      --muted: #907b7b;
+      --accent: #e5b4c0;
+      --accent-strong: #d68aa0;
+      --gold: #f0d9a8;
+      --success: #c8f2d1;
+      --danger: #f4c4c4;
+      --shadow: 0 12px 30px rgba(84, 64, 64, 0.12);
+    }
+
+    * {
+      box-sizing: border-box;
+      font-family: "Inter", "Segoe UI", sans-serif;
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    header {
+      padding: 24px 20px 0;
+      text-align: center;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 2rem;
+      letter-spacing: 0.02em;
+    }
+
+    header p {
+      margin: 8px auto 16px;
+      max-width: 720px;
+      color: var(--muted);
+    }
+
+    main {
+      display: grid;
+      grid-template-columns: minmax(300px, 1.1fr) minmax(280px, 0.9fr);
+      gap: 20px;
+      padding: 10px 20px 30px;
+      flex: 1;
+    }
+
+    section {
+      background: var(--card);
+      border-radius: 16px;
+      padding: 18px;
+      box-shadow: var(--shadow);
+    }
+
+    .panel-title {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .panel-title h2 {
+      margin: 0;
+      font-size: 1.1rem;
+    }
+
+    .resource-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 10px;
+    }
+
+    .resource-card {
+      border: 1px solid #f0e5e5;
+      border-radius: 12px;
+      padding: 12px;
+      background: #fff8fb;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .resource-card strong {
+      display: block;
+      font-size: 1.1rem;
+      margin-bottom: 4px;
+    }
+
+    .resource-card span {
+      font-weight: 600;
+      font-size: 1.3rem;
+    }
+
+    .resource-card .rate {
+      color: var(--muted);
+      font-size: 0.85rem;
+    }
+
+    .pulse {
+      animation: pulse 0.6s ease;
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(1); background: #fff8fb; }
+      50% { transform: scale(1.04); background: var(--success); }
+      100% { transform: scale(1); background: #fff8fb; }
+    }
+
+    .building-list {
+      display: grid;
+      gap: 12px;
+    }
+
+    .building {
+      border: 1px solid #f2e5e5;
+      border-radius: 14px;
+      padding: 12px;
+      background: #fff;
+    }
+
+    .building h3 {
+      margin: 0 0 4px;
+      font-size: 1rem;
+    }
+
+    .building p {
+      margin: 4px 0;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    .building .actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 8px;
+    }
+
+    button {
+      border: none;
+      border-radius: 999px;
+      padding: 8px 14px;
+      background: var(--accent);
+      color: var(--ink);
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.15s ease, background 0.2s ease;
+    }
+
+    button:hover:not(:disabled) {
+      background: var(--accent-strong);
+      transform: translateY(-1px);
+    }
+
+    button:disabled {
+      cursor: not-allowed;
+      opacity: 0.6;
+    }
+
+    .collect-btn {
+      background: var(--gold);
+    }
+
+    .research-card {
+      border: 1px solid #f2e5e5;
+      border-radius: 14px;
+      padding: 12px;
+      margin-bottom: 10px;
+      background: #fff;
+    }
+
+    .research-card h4 {
+      margin: 0 0 6px;
+    }
+
+    .research-card p {
+      margin: 0 0 8px;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    .status {
+      font-size: 0.85rem;
+      color: var(--muted);
+    }
+
+    .win-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(35, 20, 30, 0.6);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 10;
+    }
+
+    .win-card {
+      background: #fff;
+      border-radius: 20px;
+      padding: 24px;
+      text-align: center;
+      max-width: 420px;
+      box-shadow: var(--shadow);
+    }
+
+    .win-card h2 {
+      margin-top: 0;
+    }
+
+    .footer {
+      text-align: center;
+      padding: 10px 20px 20px;
+      color: var(--muted);
+      font-size: 0.85rem;
+    }
+
+    @media (max-width: 860px) {
+      main {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Glow Empire ✨</h1>
+    <p>Grow a beauty dynasty in 10 minutes. Build labs, source ingredients, package products, and scale your brand value.</p>
+  </header>
+
+  <main>
+    <section>
+      <div class="panel-title">
+        <h2>🏗️ Facilities</h2>
+        <button class="collect-btn" id="collect-btn">Collect +1s</button>
+      </div>
+      <div class="building-list" id="building-list"></div>
+    </section>
+
+    <section>
+      <div class="panel-title">
+        <h2>📊 Resources</h2>
+        <button id="restart-btn">Restart</button>
+      </div>
+      <div class="resource-grid" id="resource-grid"></div>
+
+      <div class="panel-title" style="margin-top: 18px;">
+        <h2>🧬 Research</h2>
+        <span class="status" id="research-status">No research active</span>
+      </div>
+      <div id="research-list"></div>
+    </section>
+  </main>
+
+  <div class="win-overlay" id="win-overlay">
+    <div class="win-card">
+      <h2>💎 Global Beauty Brand!</h2>
+      <p>You hit 1,000 Brand Value. Your cosmetic empire owns every runway.</p>
+      <button id="win-restart">Play Again</button>
+    </div>
+  </div>
+
+  <div class="footer">
+    Tip: Invest in R&amp;D early, then feed the Brand Studio to multiply Brand Value.
+  </div>
+
+  <script>
+    // =====================
+    // STATE & CONSTANTS
+    // =====================
+    const WIN_VALUE = 1000;
+
+    const BUILD_TIME_BASE = 6; // seconds
+    const COST_SCALAR = 1.4; // exponential cost curve
+
+    const RESOURCES = [
+      { key: "formula", label: "💄 Formula Points", rateKey: "formulaRate" },
+      { key: "ingredients", label: "🧪 Active Ingredients", rateKey: "ingredientsRate" },
+      { key: "packaging", label: "📦 Packaging Units", rateKey: "packagingRate" },
+      { key: "brand", label: "💰 Brand Value", rateKey: "brandRate" }
+    ];
+
+    const BUILDINGS = {
+      rdLab: {
+        name: "R&D Lab",
+        emoji: "🧫",
+        description: "Produces Formula Points.",
+        baseCost: { formula: 15 },
+        baseProduction: { formula: 4 },
+        baseBuildTime: BUILD_TIME_BASE
+      },
+      sourcing: {
+        name: "Ingredient Sourcing Center",
+        emoji: "🌿",
+        description: "Produces Active Ingredients.",
+        baseCost: { formula: 12, packaging: 4 },
+        baseProduction: { ingredients: 3 },
+        baseBuildTime: BUILD_TIME_BASE + 2
+      },
+      packaging: {
+        name: "Packaging Factory",
+        emoji: "🎁",
+        description: "Produces Packaging Units.",
+        baseCost: { formula: 12, ingredients: 4 },
+        baseProduction: { packaging: 3 },
+        baseBuildTime: BUILD_TIME_BASE + 2
+      },
+      brandStudio: {
+        name: "Brand Studio",
+        emoji: "🎨",
+        description: "Converts resources into Brand Value.",
+        baseCost: { formula: 18, ingredients: 8, packaging: 8 },
+        baseProduction: { brand: 2 },
+        conversion: { formula: 5, ingredients: 3, packaging: 2 },
+        baseBuildTime: BUILD_TIME_BASE + 4
+      }
+    };
+
+    const RESEARCH = {
+      cleanBeauty: {
+        name: "Clean Beauty",
+        description: "+10% production for all facilities.",
+        cost: { formula: 50, ingredients: 20 },
+        duration: 18,
+        apply: (state) => { state.productionMultiplier += 0.1; }
+      },
+      luxury: {
+        name: "Luxury Positioning",
+        description: "Brand Value +20%.",
+        cost: { formula: 80, ingredients: 30, packaging: 30 },
+        duration: 24,
+        apply: (state) => { state.brandMultiplier += 0.2; }
+      },
+      fastLaunch: {
+        name: "Fast Launch Cycles",
+        description: "Build time -20%.",
+        cost: { formula: 60, packaging: 30 },
+        duration: 20,
+        apply: (state) => { state.buildTimeMultiplier -= 0.2; }
+      }
+    };
+
+    const defaultState = () => ({
+      resources: {
+        formula: 30,
+        ingredients: 15,
+        packaging: 12,
+        brand: 0
+      },
+      buildings: {
+        rdLab: { level: 0, buildQueue: 0 },
+        sourcing: { level: 0, buildQueue: 0 },
+        packaging: { level: 0, buildQueue: 0 },
+        brandStudio: { level: 0, buildQueue: 0 }
+      },
+      research: {
+        active: null,
+        remaining: 0,
+        completed: {}
+      },
+      productionMultiplier: 1,
+      brandMultiplier: 1,
+      buildTimeMultiplier: 1,
+      win: false
+    });
+
+    let state = defaultState();
+
+    // =====================
+    // UI HELPERS
+    // =====================
+    const buildingList = document.getElementById("building-list");
+    const resourceGrid = document.getElementById("resource-grid");
+    const researchList = document.getElementById("research-list");
+    const researchStatus = document.getElementById("research-status");
+    const collectBtn = document.getElementById("collect-btn");
+    const winOverlay = document.getElementById("win-overlay");
+
+    const numberFormat = new Intl.NumberFormat("en", { maximumFractionDigits: 1 });
+
+    const resourceElements = {};
+    const buildingElements = {};
+    const researchElements = {};
+
+    function createResourceCards() {
+      resourceGrid.innerHTML = "";
+      RESOURCES.forEach((resource) => {
+        const card = document.createElement("div");
+        card.className = "resource-card";
+        card.innerHTML = `
+          <strong>${resource.label}</strong>
+          <span id="${resource.key}-value">0</span>
+          <div class="rate" id="${resource.key}-rate">+0 /s</div>
+        `;
+        resourceGrid.appendChild(card);
+        resourceElements[resource.key] = {
+          value: card.querySelector(`#${resource.key}-value`),
+          rate: card.querySelector(`#${resource.key}-rate`),
+          card
+        };
+      });
+    }
+
+    function createBuildings() {
+      buildingList.innerHTML = "";
+      Object.entries(BUILDINGS).forEach(([key, building]) => {
+        const wrapper = document.createElement("div");
+        wrapper.className = "building";
+        wrapper.innerHTML = `
+          <h3>${building.emoji} ${building.name}</h3>
+          <p>${building.description}</p>
+          <div class="status" id="${key}-status"></div>
+          <div class="actions">
+            <button id="${key}-build">Build</button>
+            <button id="${key}-upgrade">Upgrade</button>
+          </div>
+          <div class="status" id="${key}-cost"></div>
+        `;
+        buildingList.appendChild(wrapper);
+        buildingElements[key] = {
+          status: wrapper.querySelector(`#${key}-status`),
+          cost: wrapper.querySelector(`#${key}-cost`),
+          buildBtn: wrapper.querySelector(`#${key}-build`),
+          upgradeBtn: wrapper.querySelector(`#${key}-upgrade`)
+        };
+      });
+    }
+
+    function createResearch() {
+      researchList.innerHTML = "";
+      Object.entries(RESEARCH).forEach(([key, tech]) => {
+        const card = document.createElement("div");
+        card.className = "research-card";
+        card.innerHTML = `
+          <h4>${tech.name}</h4>
+          <p>${tech.description}</p>
+          <button id="${key}-research">Start Research</button>
+          <div class="status" id="${key}-status"></div>
+        `;
+        researchList.appendChild(card);
+        researchElements[key] = {
+          button: card.querySelector(`#${key}-research`),
+          status: card.querySelector(`#${key}-status`)
+        };
+      });
+    }
+
+    // =====================
+    // GAME LOGIC
+    // =====================
+    function costForBuilding(key) {
+      const building = BUILDINGS[key];
+      const level = state.buildings[key].level + state.buildings[key].buildQueue;
+      const multiplier = Math.pow(COST_SCALAR, level);
+      const cost = {};
+      Object.entries(building.baseCost).forEach(([resource, amount]) => {
+        cost[resource] = Math.ceil(amount * multiplier);
+      });
+      return cost;
+    }
+
+    function buildTimeForBuilding(key) {
+      const base = BUILDINGS[key].baseBuildTime;
+      return Math.max(2, Math.ceil(base * state.buildTimeMultiplier));
+    }
+
+    function canAfford(cost) {
+      return Object.entries(cost).every(([resource, amount]) => state.resources[resource] >= amount);
+    }
+
+    function spend(cost) {
+      Object.entries(cost).forEach(([resource, amount]) => {
+        state.resources[resource] -= amount;
+      });
+    }
+
+    function enqueueBuilding(key) {
+      const cost = costForBuilding(key);
+      if (!canAfford(cost)) return;
+      spend(cost);
+      state.buildings[key].buildQueue = buildTimeForBuilding(key);
+      flashResourceCards();
+    }
+
+    function tickBuildings() {
+      Object.entries(state.buildings).forEach(([key, data]) => {
+        if (data.buildQueue > 0) {
+          data.buildQueue -= 1;
+          if (data.buildQueue === 0) {
+            data.level += 1;
+          }
+        }
+      });
+    }
+
+    function productionRates() {
+      const rates = {
+        formula: 0,
+        ingredients: 0,
+        packaging: 0,
+        brand: 0
+      };
+
+      Object.entries(BUILDINGS).forEach(([key, building]) => {
+        const level = state.buildings[key].level;
+        if (level === 0) return;
+        const multiplier = state.productionMultiplier;
+        Object.entries(building.baseProduction).forEach(([resource, amount]) => {
+          rates[resource] += amount * level * multiplier;
+        });
+      });
+
+      const studioLevel = state.buildings.brandStudio.level;
+      if (studioLevel > 0) {
+        const conversion = BUILDINGS.brandStudio.conversion;
+        const capacity = studioLevel;
+        const possible = Math.min(
+          Math.floor(state.resources.formula / (conversion.formula * capacity)),
+          Math.floor(state.resources.ingredients / (conversion.ingredients * capacity)),
+          Math.floor(state.resources.packaging / (conversion.packaging * capacity))
+        );
+        if (Number.isFinite(possible) && possible > 0) {
+          const batches = Math.min(capacity, possible);
+          state.resources.formula -= conversion.formula * batches;
+          state.resources.ingredients -= conversion.ingredients * batches;
+          state.resources.packaging -= conversion.packaging * batches;
+          rates.brand += BUILDINGS.brandStudio.baseProduction.brand * batches * state.brandMultiplier;
+        }
+      }
+
+      return rates;
+    }
+
+    function applyProduction(rates) {
+      Object.entries(rates).forEach(([resource, amount]) => {
+        state.resources[resource] += amount;
+      });
+    }
+
+    function tickResearch() {
+      if (!state.research.active) return;
+      state.research.remaining -= 1;
+      if (state.research.remaining <= 0) {
+        const key = state.research.active;
+        RESEARCH[key].apply(state);
+        state.research.completed[key] = true;
+        state.research.active = null;
+        state.research.remaining = 0;
+      }
+    }
+
+    function startResearch(key) {
+      if (state.research.active || state.research.completed[key]) return;
+      const tech = RESEARCH[key];
+      if (!canAfford(tech.cost)) return;
+      spend(tech.cost);
+      state.research.active = key;
+      state.research.remaining = tech.duration;
+    }
+
+    function collectBurst() {
+      const rates = productionRates();
+      applyProduction(rates);
+      flashResourceCards();
+    }
+
+    function checkWin() {
+      if (state.resources.brand >= WIN_VALUE) {
+        state.win = true;
+        winOverlay.style.display = "flex";
+      }
+    }
+
+    // =====================
+    // UI UPDATES
+    // =====================
+    function formatCost(cost) {
+      return Object.entries(cost)
+        .map(([resource, amount]) => `${amount} ${resource}`)
+        .join(" · ");
+    }
+
+    function updateResources(rates) {
+      RESOURCES.forEach((resource) => {
+        const value = state.resources[resource.key];
+        const rate = rates[resource.key];
+        const element = resourceElements[resource.key];
+        element.value.textContent = numberFormat.format(value);
+        element.rate.textContent = `+${numberFormat.format(rate)} /s`;
+      });
+    }
+
+    function updateBuildings() {
+      Object.entries(BUILDINGS).forEach(([key, building]) => {
+        const data = state.buildings[key];
+        const status = data.buildQueue > 0
+          ? `Level ${data.level} → upgrading (${data.buildQueue}s)`
+          : `Level ${data.level}`;
+        buildingElements[key].status.textContent = status;
+
+        const cost = costForBuilding(key);
+        buildingElements[key].cost.textContent = `Cost: ${formatCost(cost)} · Build time: ${buildTimeForBuilding(key)}s`;
+
+        const canBuild = canAfford(cost) && data.buildQueue === 0;
+        buildingElements[key].buildBtn.disabled = !canBuild;
+        buildingElements[key].upgradeBtn.disabled = !canBuild || data.level === 0;
+      });
+    }
+
+    function updateResearch() {
+      if (state.research.active) {
+        const activeTech = RESEARCH[state.research.active];
+        researchStatus.textContent = `Researching ${activeTech.name} (${state.research.remaining}s)`;
+      } else {
+        researchStatus.textContent = "No research active";
+      }
+
+      Object.entries(RESEARCH).forEach(([key, tech]) => {
+        const element = researchElements[key];
+        const isDone = state.research.completed[key];
+        const isActive = state.research.active === key;
+        const canStart = !state.research.active && !isDone && canAfford(tech.cost);
+        element.button.disabled = !canStart;
+        element.button.textContent = isDone ? "Completed" : isActive ? "Researching..." : "Start Research";
+        element.status.textContent = `Cost: ${formatCost(tech.cost)} · Time: ${tech.duration}s`;
+      });
+    }
+
+    function flashResourceCards() {
+      Object.values(resourceElements).forEach((element) => {
+        element.card.classList.remove("pulse");
+        void element.card.offsetWidth;
+        element.card.classList.add("pulse");
+      });
+    }
+
+    function bindActions() {
+      Object.keys(BUILDINGS).forEach((key) => {
+        buildingElements[key].buildBtn.addEventListener("click", () => enqueueBuilding(key));
+        buildingElements[key].upgradeBtn.addEventListener("click", () => enqueueBuilding(key));
+      });
+
+      Object.keys(RESEARCH).forEach((key) => {
+        researchElements[key].button.addEventListener("click", () => startResearch(key));
+      });
+
+      collectBtn.addEventListener("click", collectBurst);
+
+      document.getElementById("restart-btn").addEventListener("click", resetGame);
+      document.getElementById("win-restart").addEventListener("click", resetGame);
+    }
+
+    function resetGame() {
+      state = defaultState();
+      winOverlay.style.display = "none";
+    }
+
+    // =====================
+    // GAME LOOP
+    // =====================
+    function gameTick() {
+      tickBuildings();
+      tickResearch();
+      const rates = productionRates();
+      applyProduction(rates);
+      updateResources(rates);
+      updateBuildings();
+      updateResearch();
+      checkWin();
+    }
+
+    function init() {
+      createResourceCards();
+      createBuildings();
+      createResearch();
+      bindActions();
+      updateResources({ formula: 0, ingredients: 0, packaging: 0, brand: 0 });
+      updateBuildings();
+      updateResearch();
+      setInterval(gameTick, 1000);
+    }
+
+    init();
+  </script>
+</body>
+</html>
